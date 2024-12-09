@@ -15,15 +15,21 @@ app.set("views", path.resolve(__dirname, "WebPages"));
 app.set("view engine", "ejs");
 
 
-require("dotenv").config({ path: path.resolve(__dirname, 'envVariables/.env') })
+require("dotenv").config({ path: path.resolve(__dirname, 'credentialsDontPost/.env') })
+console.log(process.env.MONGO_DB_USERNAME);
 
 // Session Middleware
 app.use(session({
-  secret: 'your_secret_key', // Replace with a real secret key
+  secret: process.env.JWT_SECRET,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Set to true if using https
+  cookie: { secure: false }
 }));
+
+const db = process.env.MONGO_DB_NAME;
+const collection = process.env.MONGO_COLLECTION;
+const uri = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@firstcluster.qcigm.mongodb.net/?retryWrites=true&w=majority&appName=FirstCluster`;
+const client = new MongoClient(uri, { serverApi: ServerApiVersion.v1 }); 
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -36,6 +42,8 @@ console.log(`Web server started and running at http://localhost:${portNumber}`);
 app.set("views", path.resolve(__dirname, "WebPages"));
 app.set("view engine", "ejs");
 
+
+
 app.get("/", (request, response) => {
     response.render("home");
 });
@@ -44,27 +52,59 @@ app.get("/register", (req, res) => {
   res.render("register");
 });
 
+async function checkEmailExists(email) {
+  try {
+    await client.connect();
+    const existingUser = await client.db(db).collection(collection).findOne({ email: email });
+    return existingUser !== null; // Return true if email exists, false otherwise
+  } catch (e) {
+    console.error("Error checking email:", e);
+    return false;
+  } finally {
+    await client.close();
+  }
+}
+
 async function saveUser(user) {
   // TODO: Save user to database
+
+  try {
+      await client.connect();
+      const result = await client.db(db).collection(collection).insertOne(user);
+
+      console.log(`User registered in database with id ${result.insertedId}`);
+  } catch (e) {
+      console.error(e);
+  } finally {
+      await client.close();
+  }
 }
 
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
-  //const salt = bcrypt.genSaltSync();
-  //const hashedPassword = bcrypt.hashSync(password, salt);
+
+  if (await checkEmailExists(email)) {
+    return res.status(400).send("Email already exists");
+  }
+
+  const salt = bcrypt.genSaltSync();
+  const hashedPassword = bcrypt.hashSync(password, salt);
 
   const newUser = {
     username: username,
     email: email,
-    password: password, // Note: Temporarily not hashing
+    password: hashedPassword,
     highScore: 0,
   };
 
   try {
     await saveUser(newUser);
     res.redirect("/login");
+
   } catch (err) {
-    res.status(500).send("Error registering user");
+    console.error(err);
+    res.status(500)
+    res.send("Error registering user");
   }
 });
 
@@ -81,12 +121,14 @@ app.post("/login", async (req, res) => {
 
   const user = await getUserByEmail(email);
   if (!user) {
-    return res.status(400).send("User not found");
+    res.status(400)
+    res.send("User not found");
   }
 
   //const isMatch = bcrypt.compareSync(password, hashed);
   if (false) { // Temporarily disabled
-    return res.status(400).send("Invalid credentials");
+    res.status(400)
+    res.send("Invalid credentials");
   }
 
   // Storing user in session 
@@ -97,7 +139,7 @@ app.post("/login", async (req, res) => {
 // Dashboard (User profile and leaderboard)
 app.get("/dashboard", (req, res) => {
   if (!req.session.user) {
-    return res.redirect("/login");
+    res.redirect("/login");
   }
   res.render("dashboard", { user: req.session.user });
 });
