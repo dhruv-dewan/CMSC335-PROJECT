@@ -48,6 +48,10 @@ app.get("/", (request, response) => {
     response.render("home");
 });
 
+app.get("/error", (req, res) => {
+  res.render("error", { errorMessage: "An error occurred." });
+});
+
 app.get("/register", (req, res) => {
   res.render("register");
 });
@@ -66,7 +70,6 @@ async function checkEmailExists(email) {
 }
 
 async function saveUser(user) {
-  // TODO: Save user to database
 
   try {
       await client.connect();
@@ -84,7 +87,7 @@ app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
 
   if (await checkEmailExists(email)) {
-    return res.status(400).send("Email already exists");
+    return res.render("error", { errorMessage: "Email already exists, please try again!" });
   }
 
   const salt = bcrypt.genSaltSync();
@@ -103,8 +106,7 @@ app.post("/register", async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500)
-    res.send("Error registering user");
+    return res.render("error", { errorMessage: "Error registering user, please try again!" });
   }
 });
 
@@ -113,22 +115,29 @@ app.get("/login", (req, res) => {
 });
 
 async function getUserByEmail(email) {
-  // TODO: Get user from database by email
+  try {
+    await client.connect();
+    const existingUser = await client.db(db).collection(collection).findOne({ email: email });
+    return existingUser;
+  } catch (e) {
+    console.error("Error checking email:", e);
+    return null;
+  } finally {
+    await client.close();
+  }
 }
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   const user = await getUserByEmail(email);
-  if (!user) {
-    res.status(400)
-    res.send("User not found");
+  if (user === null) {
+    return res.render("error", { errorMessage: "User not found, please try again!" });
   }
 
-  //const isMatch = bcrypt.compareSync(password, hashed);
-  if (false) { // Temporarily disabled
-    res.status(400)
-    res.send("Invalid credentials");
+  const isMatch = bcrypt.compareSync(password, user.password);
+  if (!isMatch) {
+    return res.render("error", { errorMessage: "Invalid credentials, please try again!" });
   }
 
   // Storing user in session 
