@@ -168,13 +168,12 @@ app.get("/trivia", async (req, res) => {
 
 
 app.post("/submit-answers", (req, res) => {
-  const userAnswers = req.body; // Contains user's answers
+  const userAnswers = req.body; 
   const correctAnswers = req.session.correctAnswers || []; // Get correct answers from session
   const questions = req.session.questions || []; // Get questions from session
 
   let score = 0;
 
-  // Calculate the score
   correctAnswers.forEach((correctAnswer, index) => {
       if (userAnswers[`question-${index}`] === correctAnswer) {
           score++;
@@ -183,7 +182,6 @@ app.post("/submit-answers", (req, res) => {
 
   const total = correctAnswers.length;
 
-  // Render results.ejs with all required variables
   res.render("results", {
       score,
       total,
