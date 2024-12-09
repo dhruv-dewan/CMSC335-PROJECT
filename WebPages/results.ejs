@@ -2,68 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trivia Results</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-        .result-container {
-            background-color: #f4f4f4;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .score {
-            font-size: 48px;
-            color: #4CAF50;
-            margin-bottom: 20px;
-        }
-        .total {
-            font-size: 24px;
-            color: #666;
-        }
-        .actions {
-            margin-top: 30px;
-        }
-        .btn {
-            display: inline-block;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 0 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <div class="result-container">
+    <header>
         <h1>Trivia Results</h1>
-        <div class="score"><%= score %> / <%= total %></div>
-        <div class="total">Total Questions: <%= total %></div>
-        
-        <% const percentage = Math.round((score / total) * 100); %>
-        <p>
-            You scored <%= percentage %>%
-            <% if (percentage >= 90) { %>
-                Excellent job!
-            <% } else if (percentage >= 70) { %>
-                Great work!
-            <% } else if (percentage >= 50) { %>
-                Good effort!
-            <% } else { %>
-                Keep practicing!
-            <% } %>
-        </p>
+    </header>
+    <main>
+        <h2>Your Score: <%= score %> / <%= total %></h2>
 
-        <div class="actions">
+        <p>Total Questions: <%= total %></p>
+        <% const percentage = Math.round((score / total) * 100); %>
+        <p>You scored: <%= percentage %>%</p>
+
+        <% if (percentage >= 90) { %>
+            <p>Excellent job! You're a trivia master!</p>
+        <% } else if (percentage >= 70) { %>
+            <p>Great work! Keep honing your skills!</p>
+        <% } else if (percentage >= 50) { %>
+            <p>Good effort! A little more practice and you'll ace it.</p>
+        <% } else { %>
+            <p>Keep practicing! You'll get there.</p>
+        <% } %>
+
+        <section>
+            <h2>Question Breakdown:</h2>
+            <% if (questions && questions.length > 0) { %>
+                <ul>
+                    <% questions.forEach((question, index) => { %>
+                        <li>
+                            <h3>Question <%= index + 1 %>: <%= question.text %></h3>
+                            <p>
+                                <strong>Your Answer:</strong> 
+                                <%= userAnswers[`question-${index}`] || 'No answer provided.' %>
+                            </p>
+                            <p>
+                                <strong>Correct Answer:</strong> <%= question.correctAnswer %>
+                            </p>
+                            <% if (userAnswers[`question-${index}`] === question.correctAnswer) { %>
+                                <p style="color: green;">Correct!</p>
+                            <% } else { %>
+                                <p style="color: red;">Incorrect.</p>
+                            <% } %>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <p>No questions available.</p>
+            <% } %>
+        </section>
+        
+
+        <div>
             <a href="/trivia" class="btn">Try Again</a>
             <a href="/dashboard" class="btn">Back to Dashboard</a>
         </div>
-    </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Trivia Game. All rights reserved.</p>
+    </footer>
 </body>
 </html>
