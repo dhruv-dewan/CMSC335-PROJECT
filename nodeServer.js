@@ -4,17 +4,30 @@ const path = require("path");
 const fs = require("fs");
 
 // User Authentication and Sessiin
-//const bcrypt = require("bcrypt"); 
-//const jwt = require("jsonwebtoken");
-//const session = require("express-session");
+const bcrypt = require("bcrypt"); 
+const jwt = require("jsonwebtoken");
+const session = require("express-session");
 
 const app = express();
-const portNumber = 5000;
-// const { MongoClient, ServerApiVersion } = require('mongodb');
+const portNumber = 4000;
+const { MongoClient, ServerApiVersion } = require('mongodb');
+app.set("views", path.resolve(__dirname, "WebPages"));
+app.set("view engine", "ejs");
+
 
 require("dotenv").config({ path: path.resolve(__dirname, 'envVariables/.env') })
 
+// Session Middleware
+app.use(session({
+  secret: 'your_secret_key', // Replace with a real secret key
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set to true if using https
+}));
+
 app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.json());
+
 process.stdin.setEncoding("utf8");
 
 app.listen(portNumber);
@@ -37,13 +50,13 @@ async function saveUser(user) {
 
 app.post("/register", async (req, res) => {
   const { username, email, password } = req.body;
-  //const salt = await bcrypt.genSalt(10);
-  //const hashedPassword = await bcrypt.hash(password, salt);
+  //const salt = bcrypt.genSaltSync();
+  //const hashedPassword = bcrypt.hashSync(password, salt);
 
   const newUser = {
     username: username,
     email: email,
-    password: hashedPassword,
+    password: password, // Note: Temporarily not hashing
     highScore: 0,
   };
 
@@ -51,8 +64,7 @@ app.post("/register", async (req, res) => {
     await saveUser(newUser);
     res.redirect("/login");
   } catch (err) {
-    res.status(500)
-    res.send("Error registering user");
+    res.status(500).send("Error registering user");
   }
 });
 
@@ -69,17 +81,15 @@ app.post("/login", async (req, res) => {
 
   const user = await getUserByEmail(email);
   if (!user) {
-    return res.status(400)
-    res.send("User not found");
+    return res.status(400).send("User not found");
   }
 
-  //const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return res.status(400)
-    res.send("Invalid credentials");
+  //const isMatch = bcrypt.compareSync(password, hashed);
+  if (false) { // Temporarily disabled
+    return res.status(400).send("Invalid credentials");
   }
 
-  // Storing user in session here to keep track of user -- NEEDS TO BE TESTED
+  // Storing user in session 
   req.session.user = user;
   res.redirect("/dashboard");
 });
@@ -125,3 +135,60 @@ process.stdin.on("readable", function () {
   }
 });
 
+app.get("/trivia", async (req, res) => {
+  const apiUrl = "https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple";
+
+  try {
+    const response = await global.fetch(apiUrl);
+    const data = await response.json();
+
+    // Map questions with shuffled options
+    const questions = data.results.map((item) => {
+      const options = [...item.incorrect_answers, item.correct_answer].sort(() => Math.random() - 0.5);
+      return {
+        question: decodeURIComponent(item.question),
+        options: options.map(decodeURIComponent),
+        correctAnswer: decodeURIComponent(item.correct_answer),
+      };
+    });
+
+    // Store correct answers in session for validation
+    req.session.correctAnswers = data.results.map(item => decodeURIComponent(item.correct_answer));
+
+    res.render("trivia", { questions }); // Pass questions to the EJS view
+  } catch (error) {
+    console.error("Error fetching trivia questions:", error);
+    res.status(500).send("Unable to load trivia questions. Please try again later.");
+  }
+});
+
+app.post("/submit-answers", (req, res) => {
+  const answers = req.body.answers || {}; // Default to empty object if undefined
+  const correctAnswers = req.session.correctAnswers || []; 
+
+  let score = 0;
+  for (let i = 0; i < correctAnswers.length; i++) {
+    if (answers[`question-${i}`] === correctAnswers[i]) {
+      score++;
+    }
+  }
+
+  // Check if user is logged in before updating high score
+  if (req.session.user) {
+    if (!req.session.user.highScore || score > req.session.user.highScore) {
+      req.session.user.highScore = score;
+      // TODO: Save updated score to database
+    }
+  }
+
+  try {
+    // Add explicit error handling
+    res.render("results", { 
+      score, 
+      total: correctAnswers.length 
+    });
+  } catch (error) {
+    console.error("Error rendering results page:", error);
+    res.status(500).send(`Error rendering results: ${error.message}`);
+  }
+});

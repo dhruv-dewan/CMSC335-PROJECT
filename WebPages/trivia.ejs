@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia Game</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Optional CSS file -->
+</head>
+<body>
+    <header>
+        <h1>Trivia Game</h1>
+        <p>Test your knowledge with these trivia questions!</p>
+    </header>
+    <main>
+        <div id="trivia-container">
+            <form id="trivia-form" method="post" action="/submit-answers">
+                <% if (questions && questions.length > 0) { %>
+                    <% questions.forEach((question, index) => { %>
+                        <div class="trivia-question">
+                            <h3>Question <%= index + 1 %>: <%= question.question %></h3>
+                            <ul>
+                                <% question.options.forEach((option, optIndex) => { %>
+                                    <li>
+                                        <label>
+                                            <input 
+                                                type="radio" 
+                                                name="question-<%= index %>" 
+                                                value="<%= option %>" 
+                                                required>
+                                            <%= option %>
+                                        </label>
+                                    </li>
+                                <% }) %>
+                            </ul>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No questions available at the moment. Please try again later!</p>
+                <% } %>
+                <button type="submit">Submit Answers</button>
+            </form>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Trivia Game. All rights reserved.</p>
+    </footer>
+    <script>
+        // Optional: Add any client-side interactivity or validation
+    </script>
+</body>
+</html>
