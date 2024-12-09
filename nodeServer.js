@@ -181,58 +181,69 @@ app.get("/trivia", async (req, res) => {
   const apiUrl = "https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple";
 
   try {
-    const response = await global.fetch(apiUrl);
-    const data = await response.json();
+      const response = await fetch(apiUrl);
+      const data = await response.json();
 
-    // Map questions with shuffled options
-    const questions = data.results.map((item) => {
-      const options = [...item.incorrect_answers, item.correct_answer].sort(() => Math.random() - 0.5);
-      return {
-        question: decodeURIComponent(item.question),
-        options: options.map(decodeURIComponent),
-        correctAnswer: decodeURIComponent(item.correct_answer),
-      };
-    });
+      if (data.results && data.results.length > 0) {
+          const questions = data.results.map((item) => {
+              const options = [...item.incorrect_answers, item.correct_answer].sort(() => Math.random() - 0.5);
+              return {
+                  question: item.question,
+                  options: options,
+                  correctAnswer: item.correct_answer, // For validation
+              };
+          });
 
-    // Store correct answers in session for validation
-    req.session.correctAnswers = data.results.map(item => decodeURIComponent(item.correct_answer));
+          req.session.questions = questions; // Store questions in session
+          req.session.correctAnswers = questions.map(q => q.correctAnswer); // Store correct answers in session
 
-    res.render("trivia", { questions }); // Pass questions to the EJS view
+          res.render("trivia", { questions });
+      } else {
+          console.error("No questions fetched from API.");
+          res.render("trivia", { questions: [] });
+      }
   } catch (error) {
-    console.error("Error fetching trivia questions:", error);
-    res.status(500)
-    res.send("Unable to load trivia questions. Please try again later.");
+      console.error("Error fetching trivia questions:", error);
+      res.status(500).send("Unable to load trivia questions. Please try again later.");
   }
 });
+
 
 app.post("/submit-answers", (req, res) => {
-  const answers = req.body.answers || {}; // Default to empty object if undefined
-  const correctAnswers = req.session.correctAnswers || []; 
+  const userAnswers = req.body; // Contains user's answers
+  const correctAnswers = req.session.correctAnswers || []; // Get correct answers from session
+  const questions = req.session.questions || []; // Get questions from session
 
   let score = 0;
-  for (let i = 0; i < correctAnswers.length; i++) {
-    if (answers[`question-${i}`] === correctAnswers[i]) {
-      score++;
-    }
-  }
 
-  // Check if user is logged in before updating high score
-  if (req.session.user) {
-    if (!req.session.user.highScore || score > req.session.user.highScore) {
-      req.session.user.highScore = score;
-      // TODO: Save updated score to database
-    }
-  }
+  // Calculate the score
+  correctAnswers.forEach((correctAnswer, index) => {
+      if (userAnswers[`question-${index}`] === correctAnswer) {
+          score++;
+      }
+  });
 
-  try {
-    // Add explicit error handling
-    res.render("results", { 
-      score, 
-      total: correctAnswers.length 
-    });
-  } catch (error) {
-    console.error("Error rendering results page:", error);
-    res.status(500)
-    res.send(`Error rendering results: ${error.message}`);
-  }
+  const total = correctAnswers.length;
+
+  // Render results.ejs with all required variables
+  res.render("results", {
+      score,
+      total,
+      userAnswers,
+      questions: questions.map((q, index) => ({
+          text: q.question,
+          correctAnswer: q.correctAnswer,
+      })),
+  });
 });
+
+
+app.get('/results', (req, res) => {
+  res.render('results', {
+    score: score,
+    total: total,
+    questions: questions || [], // Pass an empty array if questions is undefined
+    userAnswers: userAnswers || {}
+  });
+});
+
