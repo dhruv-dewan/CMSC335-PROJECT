@@ -153,13 +153,11 @@ app.get("/leaderboard", async (req, res) => {
   res.render("leaderboard", { leaderboard });
 });
 
-// LOGOUT ROUTE
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
 });
 
-// Server Shutdown
 const prompt = "Type stop to shutdown the server: \n";
 process.stdout.write(prompt);
 process.stdin.on("readable", function () {
@@ -190,12 +188,12 @@ app.get("/trivia", async (req, res) => {
               return {
                   question: item.question,
                   options: options,
-                  correctAnswer: item.correct_answer, // For validation
+                  correctAnswer: item.correct_answer,
               };
           });
 
-          req.session.questions = questions; // Store questions in session
-          req.session.correctAnswers = questions.map(q => q.correctAnswer); // Store correct answers in session
+          req.session.questions = questions;
+          req.session.correctAnswers = questions.map(q => q.correctAnswer);
 
           res.render("trivia", { questions });
       } else {
@@ -211,8 +209,8 @@ app.get("/trivia", async (req, res) => {
 
 app.post("/submit-answers", (req, res) => {
   const userAnswers = req.body; 
-  const correctAnswers = req.session.correctAnswers || []; // Get correct answers from session
-  const questions = req.session.questions || []; // Get questions from session
+  const correctAnswers = req.session.correctAnswers || [];
+  const questions = req.session.questions || [];
 
   let score = 0;
 
@@ -240,7 +238,7 @@ app.get('/results', (req, res) => {
   res.render('results', {
     score: score,
     total: total,
-    questions: questions || [], // Pass an empty array if questions is undefined
+    questions: questions || [],
     userAnswers: userAnswers || {}
   });
 });
