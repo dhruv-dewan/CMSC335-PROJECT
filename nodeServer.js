@@ -81,7 +81,7 @@ async function saveUser(user) {
   } finally {
       await client.close();
   }
-  
+
 }
 
 app.post("/register", async (req, res) => {
@@ -155,7 +155,42 @@ app.get("/dashboard", (req, res) => {
 });
 
 async function getLeaderboard() {
-  // TODO: Get leaderboard from database
+    try {
+      await client.connect();
+      const leaderboardData = await client.db(db).collection(collection).find({}).sort({ highScore: -1 }).limit(10).toArray();
+
+      if (leaderboardData.length === 0) {
+      return "<p>No leaderboard data available.</p>";
+      }
+
+      let tableHtml = `
+      <table border="1">
+        <tr>
+          <th>Rank</th>
+          <th>Username</th>
+          <th>High Score</th>
+        </tr>
+      `;
+
+      leaderboardData.forEach((user, index) => {
+      tableHtml += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${user.username}</td>
+          <td>${user.highScore}</td>
+        </tr>
+        `;
+      });
+
+    tableHtml += "</table>";
+    return tableHtml;
+
+  } catch (e) {
+    console.error("Error fetching leaderboard:", e);
+    return "<p>Error fetching leaderboard data.</p>";
+  } finally {
+    await client.close();
+  }
 }
 
 app.get("/leaderboard", async (req, res) => {
