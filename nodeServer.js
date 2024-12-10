@@ -236,6 +236,15 @@ process.stdin.on("readable", function () {
   }
 });
 
+function decodeHtmlEntities(str) {
+  return str.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
+            .replace(/&quot;/g, '"')
+            .replace(/&apos;/g, "'")
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>');
+}
+
 app.get("/trivia", async (req, res) => {
   const apiUrl = "https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple";
 
@@ -244,14 +253,15 @@ app.get("/trivia", async (req, res) => {
       const data = await response.json();
 
       if (data.results && data.results.length > 0) {
-          const questions = data.results.map((item) => {
-              const options = [...item.incorrect_answers, item.correct_answer].sort(() => Math.random() - 0.5);
-              return {
-                  question: item.question,
-                  options: options,
-                  correctAnswer: item.correct_answer,
-              };
-          });
+        const questions = data.results.map((item) => {
+          const options = [...item.incorrect_answers, item.correct_answer].sort(() => Math.random() - 0.5);
+          return {
+              question: decodeHtmlEntities(item.question), // Decode the question
+              options: options.map(option => decodeHtmlEntities(option)), // Decode each option
+              correctAnswer: decodeHtmlEntities(item.correct_answer), // Decode the correct answer
+          };
+        });
+      
 
           req.session.questions = questions;
           req.session.correctAnswers = questions.map(q => q.correctAnswer);
