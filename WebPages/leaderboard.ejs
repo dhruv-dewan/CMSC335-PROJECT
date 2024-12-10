@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<<<<<<< HEAD
     <title>Leaderboard</title>
 </head>
 <body>
@@ -10,3 +11,46 @@
     <%= leaderboard %>
 </body>
 </html>
+=======
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Optional CSS file -->
+</head>
+<body>
+    <header>
+        <h1>Trivia Leaderboard</h1>
+        <p>See how you rank among other players!</p>
+    </header>
+    <main>
+        <% if (leaderboard && leaderboard.length > 0) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Username</th>
+                        <th>High Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% leaderboard.forEach((user, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td> <!-- Rank -->
+                            <td><%= user.username %></td> <!-- Username -->
+                            <td><%= user.highScore %></td> <!-- High Score -->
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p>No players have recorded high scores yet. Be the first!</p>
+        <% } %>
+        <div>
+            <a href="/dashboard" class="btn">Back to Dashboard</a>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Trivia Game. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+>>>>>>> 145868b425121d215ccbc2030cd406ebf70a7a10

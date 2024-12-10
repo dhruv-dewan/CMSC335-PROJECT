@@ -196,9 +196,23 @@ async function getLeaderboard() {
 }
 
 app.get("/leaderboard", async (req, res) => {
-  const leaderboard = await getLeaderboard();
-  res.render("leaderboard", { leaderboard });
+  try {
+    await client.connect();
+    const leaderboard = await client.db(db).collection(collection)
+      .find({}, { projection: { username: 1, highScore: 1 } })
+      .sort({ highScore: -1 })
+      .limit(10)
+      .toArray();
+
+    res.render("leaderboard", { leaderboard });
+  } catch (err) {
+    console.error("Error fetching leaderboard:", err);
+    res.render("error", { errorMessage: "Unable to load leaderboard." });
+  } finally {
+    await client.close();
+  }
 });
+
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
