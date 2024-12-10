@@ -148,14 +148,38 @@ app.post("/login", async (req, res) => {
 // Dashboard (User profile and leaderboard)
 app.get("/dashboard", (req, res) => {
   if (!req.session.user) {
-    res.redirect("/login");
+    return res.redirect("/login");
   }
+
   res.render("dashboard", { user: req.session.user });
 });
 
+
 async function getLeaderboard() {
-  // TODO: Get leaderboard from database
+  try {
+    await client.connect();
+    return await client.db(db).collection(collection)
+      .find({}, { projection: { username: 1, highScore: 1 } })
+      .sort({ highScore: -1 }) // Sort by high score in descending order
+      .limit(10)
+      .toArray();
+  } catch (err) {
+    console.error("Error fetching leaderboard:", err);
+    return [];
+  } finally {
+    await client.close();
+  }
 }
+
+app.get("/leaderboard", async (req, res) => {
+  try {
+    const leaderboard = await getLeaderboard();
+    res.render("leaderboard", { leaderboard });
+  } catch (err) {
+    res.render("error", { errorMessage: "Unable to load leaderboard." });
+  }
+});
+
 
 app.get("/leaderboard", async (req, res) => {
   const leaderboard = await getLeaderboard();
@@ -216,13 +240,15 @@ app.get("/trivia", async (req, res) => {
 });
 
 
-app.post("/submit-answers", (req, res) => {
+app.post("/submit-answers", async (req, res) => {
   const userAnswers = req.body; 
   const correctAnswers = req.session.correctAnswers || [];
   const questions = req.session.questions || [];
+  const user = req.session.user; // Access the logged-in user from the session
 
   let score = 0;
 
+  // Calculate the user's score
   correctAnswers.forEach((correctAnswer, index) => {
       if (userAnswers[`question-${index}`] === correctAnswer) {
           score++;
@@ -231,6 +257,33 @@ app.post("/submit-answers", (req, res) => {
 
   const total = correctAnswers.length;
 
+  // Check and update the user's high score
+  if (user) {
+    try {
+      await client.connect();
+      const collectionRef = client.db(db).collection(collection);
+
+      // Fetch the user's record
+      const dbUser = await collectionRef.findOne({ email: user.email });
+
+      if (dbUser && score > dbUser.highScore) {
+        // Update the high score in the database
+        await collectionRef.updateOne(
+          { email: user.email },
+          { $set: { highScore: score } }
+        );
+
+        // Update the high score in the session
+        req.session.user.highScore = score;
+      }
+    } catch (err) {
+      console.error("Error updating high score:", err);
+    } finally {
+      await client.close();
+    }
+  }
+
+  // Render the results page
   res.render("results", {
       score,
       total,
@@ -242,13 +295,4 @@ app.post("/submit-answers", (req, res) => {
   });
 });
 
-
-app.get('/results', (req, res) => {
-  res.render('results', {
-    score: score,
-    total: total,
-    questions: questions || [],
-    userAnswers: userAnswers || {}
-  });
-});
 
