@@ -174,18 +174,22 @@ async function getLeaderboard() {
 
 app.get("/leaderboard", async (req, res) => {
   try {
-    const leaderboard = await getLeaderboard();
+    await client.connect();
+    const leaderboard = await client.db(db).collection(collection)
+      .find({}, { projection: { username: 1, highScore: 1 } }) // Fetch usernames and high scores
+      .sort({ highScore: -1 }) // Sort by high score in descending order
+      .limit(10) // Limit to top 10 players
+      .toArray();
+
     res.render("leaderboard", { leaderboard });
   } catch (err) {
+    console.error("Error fetching leaderboard:", err);
     res.render("error", { errorMessage: "Unable to load leaderboard." });
+  } finally {
+    await client.close();
   }
 });
 
-
-app.get("/leaderboard", async (req, res) => {
-  const leaderboard = await getLeaderboard();
-  res.render("leaderboard", { leaderboard });
-});
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
