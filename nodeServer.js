@@ -81,6 +81,7 @@ async function saveUser(user) {
   } finally {
       await client.close();
   }
+  
 }
 
 app.post("/register", async (req, res) => {
