@@ -14,6 +14,9 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 app.set("views", path.resolve(__dirname, "WebPages"));
 app.set("view engine", "ejs");
 
+// Serve static files from the "images" directory
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 
 require("dotenv").config({ path: path.resolve(__dirname, 'credentialsDontPost/.env') })
 console.log(process.env.MONGO_DB_USERNAME);
