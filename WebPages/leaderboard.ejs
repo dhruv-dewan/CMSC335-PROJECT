@@ -19,6 +19,7 @@
                         <th>Rank</th>
                         <th>Username</th>
                         <th>High Score</th>
+                        <th>Time Taken (seconds)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -27,6 +28,7 @@
                             <td><%= index + 1 %></td> <!-- Rank -->
                             <td><%= user.username %></td> <!-- Username -->
                             <td><%= user.highScore %></td> <!-- High Score -->
+                            <td><%= user.timeTaken || "N/A" %></td> <!-- Time Taken -->
                         </tr>
                     <% }); %>
                 </tbody>
@@ -38,6 +40,7 @@
             <a href="/dashboard" class="btn">Back to Dashboard</a>
         </div>
     </main>
+    
     <footer>
         <p>&copy; 2024 Trivia Game. All rights reserved.</p>
     </footer>
