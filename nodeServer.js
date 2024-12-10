@@ -272,7 +272,7 @@ app.post("/submit-answers", async (req, res) => {
   const userAnswers = req.body; 
   const correctAnswers = req.session.correctAnswers || [];
   const questions = req.session.questions || [];
-  const user = req.session.user; // Access the logged-in user from the session
+  const user = req.session.user;
 
   let score = 0;
 
@@ -285,13 +285,12 @@ app.post("/submit-answers", async (req, res) => {
 
   const total = correctAnswers.length;
 
-  // Check and update the user's high score
   if (user) {
     try {
       await client.connect();
       const collectionRef = client.db(db).collection(collection);
 
-      // Fetch the user's record
+      // Get the user's record
       const dbUser = await collectionRef.findOne({ email: user.email });
 
       if (dbUser && score > dbUser.highScore) {
@@ -301,7 +300,6 @@ app.post("/submit-answers", async (req, res) => {
           { $set: { highScore: score } }
         );
 
-        // Update the high score in the session
         req.session.user.highScore = score;
       }
     } catch (err) {
@@ -311,7 +309,7 @@ app.post("/submit-answers", async (req, res) => {
     }
   }
 
-  // Render the results page
+
   res.render("results", {
       score,
       total,
