@@ -6,16 +6,64 @@
     <title>Trivia Game Home</title>
     <style>
         body {
-            background-image: url('/images/homepage.png'); /* Replace with your image URL */
+            background-color: #ff66c4; /* Replace with your image URL */
             background-size: cover; /* Ensures the image covers the entire page */
             background-repeat: no-repeat; /* Prevents the image from repeating */
             background-attachment: fixed; /* Keeps the background fixed during scrolling */
+            font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
         }
+
+        #reglog {
+            text-align: center;
+            margin-top:10vh; /* Moves the buttons to the bottom half of the screen */     
+        }
+
+        #title {
+            color: white;
+            font-size: 3rem;
+        }
+
+        #image {
+            width: 50%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .button {
+            display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                outline: 0;
+                border: none;
+                cursor: pointer;
+                padding: 0rem;
+                border-radius: 50px;
+                min-width: 200px;
+                height: 50px;
+                font-size: 18px;
+                background-color: white;
+                font-weight: 500;
+                color: #222;
+                text-decoration: none;
+                margin: 0.1rem;
+        }
+
+        .button:hover {
+            transform: scale(1.1); /* Slightly increases the size on hover */
+        }
+        
+
+
     </style>
 </head>
 <body>
-    <p style="text-align: center;">
-        <a href="/register">Register</a> | <a href="/login">Login</a>
+    <p id=title style="text-align: center;">The Trivia Game</p>
+
+    <img id="image" src="/images/brain2.webp" alt="Trivia Game Image">
+
+    <p id=reglog style="text-align: center;">
+        <a class="button" href="/register">Register</a> <br><br><br> <a class="button" href="/login">Login</a>
     </p>
 </body>
 </html>
