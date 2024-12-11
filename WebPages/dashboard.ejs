@@ -6,43 +6,56 @@
     <link rel="stylesheet" href="/public/styles.css">
 
     <style>
+
+        .top-part {
+            display: flex;
+            flex-direction:row;
+            align-items: stretch;
+            width: 100vw; /* Full viewport width */
+            height: 10vh;
+            margin: 0;
+            padding: 0;
+        }
+
         .button-dashboard-container {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    width: 100vw; /* Full viewport width */
-    margin: 0;
-    padding: 0;
-}
+            display: flex;
+            flex-direction:column;
+            align-items: stretch;
+            width: 90vw; /* Full viewport width */
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }   
 
-.butt-dashboard {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%; /* Ensures each button spans full width */
-    padding: 2rem; /* You can adjust the padding for button size */
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
-    color: white;
-    background-color: #007BFF; /* You can adjust this color */
-    border: none;
-    cursor: pointer;
-    margin: 0; /* Removes gap between buttons */
-}
+        .butt-dashboard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%; /* Ensures each button spans full width */
+            padding: 10vh; /* You can adjust the padding for button size */
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            background-color: #007BFF; /* You can adjust this color */
+            border: none;
+            cursor: pointer;
+            margin: 0; /* Removes gap between buttons */
+        }
 
-.butt-dashboard:hover {
-    background-color: #0056b3; /* Darker shade for hover */
-}
-
+        .butt-dashboard:hover {
+            background-color: #0056b3; /* Darker shade for hover */
+        }
 
     </style>
 </head>
 <body>
-    <h1>Welcome, <%= user.username %></h1>
-    <p>High Score: <%= user.highScore %></p>
-    <div class="button-dashboard-container" style="text-align: center;">
+    <div class="top-part">
+        <h1>Welcome, <%= user.username %></h1>
+        <p>High Score: <%= user.highScore %></p>
+    </div>
+    <div class="button-dashboard-container"style="text-align: center;">
         <a class="butt-dashboard" href="/trivia">Trivia</a><br><br>
         <a class="butt-dashboard" href="/leaderboard">Leaderboard</a><br><br>
         <a class="butt-dashboard" href="/logout">Logout</a>
