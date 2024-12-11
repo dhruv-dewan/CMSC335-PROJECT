@@ -12,11 +12,11 @@
     </header>
     <main>
         <h2>Your Score: <%= score %> / <%= total %></h2>
-
         <p>Total Questions: <%= total %></p>
+        <p>Time Taken: <%= timeTaken %> seconds</p> <!-- Display time taken -->
         <% const percentage = Math.round((score / total) * 100); %>
         <p>You scored: <%= percentage %>%</p>
-
+    
         <% if (percentage >= 90) { %>
             <p>Excellent job! You're a trivia master!</p>
         <% } else if (percentage >= 70) { %>
@@ -26,7 +26,7 @@
         <% } else { %>
             <p>Keep practicing! You'll get there.</p>
         <% } %>
-
+    
         <section>
             <h2>Question Breakdown:</h2>
             <% if (questions && questions.length > 0) { %>
@@ -34,13 +34,8 @@
                     <% questions.forEach((question, index) => { %>
                         <li>
                             <h3>Question <%= index + 1 %>: <%= question.text %></h3>
-                            <p>
-                                <strong>Your Answer:</strong> 
-                                <%= userAnswers[`question-${index}`] || 'No answer provided.' %>
-                            </p>
-                            <p>
-                                <strong>Correct Answer:</strong> <%= question.correctAnswer %>
-                            </p>
+                            <p><strong>Your Answer:</strong> <%= userAnswers[`question-${index}`] || 'No answer provided.' %></p>
+                            <p><strong>Correct Answer:</strong> <%= question.correctAnswer %></p>
                             <% if (userAnswers[`question-${index}`] === question.correctAnswer) { %>
                                 <p style="color: green;">Correct!</p>
                             <% } else { %>
@@ -53,13 +48,15 @@
                 <p>No questions available.</p>
             <% } %>
         </section>
-        
+                
 
         <div>
             <a href="/trivia" class="btn">Try Again</a>
             <a href="/dashboard" class="btn">Back to Dashboard</a>
+            <a href="/leaderboard" class="btn">Leaderboard</a>
         </div>
     </main>
+    
     <footer>
         <p>&copy; 2024 Trivia Game. All rights reserved.</p>
     </footer>

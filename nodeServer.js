@@ -14,6 +14,8 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 app.set("views", path.resolve(__dirname, "WebPages"));
 app.set("view engine", "ejs");
 
+// Serve static files from the "images" directory
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 require("dotenv").config({ path: path.resolve(__dirname, 'credentialsDontPost/.env') })
 console.log(process.env.MONGO_DB_USERNAME);
@@ -171,6 +173,7 @@ async function getLeaderboard() {
           <th>Rank</th>
           <th>Username</th>
           <th>High Score</th>
+          <th>Time Taken</th>
         </tr>
       `;
 
@@ -180,6 +183,7 @@ async function getLeaderboard() {
           <td>${index + 1}</td>
           <td>${user.username}</td>
           <td>${user.highScore}</td>
+          <td>${user.timeTaken}</td>
         </tr>
         `;
       });
@@ -199,11 +203,10 @@ app.get("/leaderboard", async (req, res) => {
   try {
     await client.connect();
     const leaderboard = await client.db(db).collection(collection)
-      .find({}, { projection: { username: 1, highScore: 1 } })
-      .sort({ highScore: -1 })
-      .limit(10)
-      .toArray();
-
+    .find({}, { projection: { username: 1, highScore: 1, timeTaken: 1 } })
+    .sort({ highScore: -1, timeTaken: 1 }) // Sort by score descending, time ascending
+    .limit(10)
+    .toArray();
     res.render("leaderboard", { leaderboard });
   } catch (err) {
     console.error("Error fetching leaderboard:", err);
@@ -236,6 +239,15 @@ process.stdin.on("readable", function () {
   }
 });
 
+function decodeHtmlEntities(str) {
+  return str.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
+            .replace(/&quot;/g, '"')
+            .replace(/&apos;/g, "'")
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>');
+}
+
 app.get("/trivia", async (req, res) => {
   const apiUrl = "https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple";
 
@@ -247,14 +259,15 @@ app.get("/trivia", async (req, res) => {
           const questions = data.results.map((item) => {
               const options = [...item.incorrect_answers, item.correct_answer].sort(() => Math.random() - 0.5);
               return {
-                  question: item.question,
-                  options: options,
-                  correctAnswer: item.correct_answer,
+                  question: decodeHtmlEntities(item.question),
+                  options: options.map(option => decodeHtmlEntities(option)),
+                  correctAnswer: decodeHtmlEntities(item.correct_answer),
               };
           });
 
           req.session.questions = questions;
           req.session.correctAnswers = questions.map(q => q.correctAnswer);
+          req.session.startTime = Date.now(); // Record the start time
 
           res.render("trivia", { questions });
       } else {
@@ -268,13 +281,17 @@ app.get("/trivia", async (req, res) => {
 });
 
 
+
+
 app.post("/submit-answers", async (req, res) => {
-  const userAnswers = req.body; 
+  const userAnswers = req.body;
   const correctAnswers = req.session.correctAnswers || [];
   const questions = req.session.questions || [];
   const user = req.session.user;
 
   let score = 0;
+  const endTime = Date.now();
+  const timeTaken = Math.floor((endTime - req.session.startTime) / 1000); // Calculate time in seconds
 
   // Calculate the user's score
   correctAnswers.forEach((correctAnswer, index) => {
@@ -285,40 +302,48 @@ app.post("/submit-answers", async (req, res) => {
 
   const total = correctAnswers.length;
 
+  // Update the user's high score and time taken in the database
   if (user) {
-    try {
-      await client.connect();
-      const collectionRef = client.db(db).collection(collection);
+      try {
+          await client.connect();
+          const collectionRef = client.db(db).collection(collection);
 
-      // Get the user's record
-      const dbUser = await collectionRef.findOne({ email: user.email });
+          const dbUser = await collectionRef.findOne({ email: user.email });
 
-      if (dbUser && score > dbUser.highScore) {
-        // Update the high score in the database
-        await collectionRef.updateOne(
-          { email: user.email },
-          { $set: { highScore: score } }
-        );
+          if (dbUser) {
+              if (
+                  score > dbUser.highScore || 
+                  (score === dbUser.highScore && timeTaken < dbUser.timeTaken)
+              ) {
+                  await collectionRef.updateOne(
+                      { email: user.email },
+                      { $set: { highScore: score, timeTaken: timeTaken } }
+                  );
 
-        req.session.user.highScore = score;
+                  // Update session data
+                  req.session.user.highScore = score;
+                  req.session.user.timeTaken = timeTaken;
+              }
+          }
+      } catch (err) {
+          console.error("Error updating high score:", err);
+      } finally {
+          await client.close();
       }
-    } catch (err) {
-      console.error("Error updating high score:", err);
-    } finally {
-      await client.close();
-    }
   }
 
-
+  // Render the results page with time taken included
   res.render("results", {
       score,
       total,
       userAnswers,
+      timeTaken, // Pass time taken to the results page
       questions: questions.map((q, index) => ({
           text: q.question,
           correctAnswer: q.correctAnswer,
       })),
   });
 });
+
 
 
