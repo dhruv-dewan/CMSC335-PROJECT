@@ -1,9 +1,9 @@
 
 body {
-    background-image: url('public/background.webp'); /* Replace with your image URL */
-    background-size: cover; /* Ensures the image covers the entire page */
-    background-repeat: no-repeat; /* Prevents the image from repeating */
-    background-attachment: fixed; /* Keeps the background fixed during scrolling */
+    background-image: url('public/background.webp');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
