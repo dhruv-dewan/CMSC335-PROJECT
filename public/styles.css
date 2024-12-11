@@ -1,0 +1,43 @@
+
+body {
+    background-color: #ff66c4; /* Replace with your image URL */
+    background-size: cover; /* Ensures the image covers the entire page */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-attachment: fixed; /* Keeps the background fixed during scrolling */
+    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+#image {
+    width: 30%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+form, h1 {
+    text-align: center;
+}
+
+.butt {
+    display: inline-flex;
+    font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        align-items: center;
+        justify-content: center;
+        outline: 0;
+        border: none;
+        cursor: pointer;
+        padding: 0rem;
+        border-radius: 50px;
+        min-width: 200px;
+        height: 40px;
+        font-size: 18px;
+        background-color: white;
+        font-weight: 500;
+        color: #222;
+        text-decoration: none;
+        margin: 0.1rem;
+}
+
+.butt:hover {
+    transform: scale(1.1); /* Slightly increases the size on hover */
+}
