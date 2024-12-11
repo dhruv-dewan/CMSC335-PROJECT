@@ -17,7 +17,7 @@ app.set("view engine", "ejs");
 // Serve static files from the "images" directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-require("dotenv").config({ path: path.resolve(__dirname, 'credentialsDontPost/.env') })
+require("dotenv").config({ path: path.resolve(__dirname, '.env') })
 console.log(process.env.MONGO_DB_USERNAME);
 
 // Session Middleware
