@@ -27,7 +27,6 @@
             margin: 0;
             padding: 0;
             color: black;
-            opacity: 1;
         }
 
         /* Style for individual buttons */
@@ -41,11 +40,10 @@
             font-size: 18px;
             font-weight: bold;
             text-decoration: none;
-            color: white;
+            color: black;
             background-color: #007BFF; /* Button color */
             border: none;
             cursor: pointer;
-            opacity: 1;
             margin: 0; /* Removes gap between buttons */
         }
 
@@ -55,7 +53,8 @@
 
         #one {
             position: relative; /* Allows the pseudo-element to be positioned relative to the anchor */
-            color: rgba(0, 0, 0, 1);
+            background-image: url('/public/trivia-background.png');
+            color: black;
             text-decoration: none; /* Remove underline from the link */
             font-size: 3rem;
             font-weight: bold;
@@ -71,31 +70,12 @@
             z-index: 2; /* Ensures text is above the background */
         }
 
-        #one::before {
-            content: ''; /* Empty content to create the background overlay */
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('/public/trivia-background.png');
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            opacity: 0.5; /* Set opacity for the background image */
-            z-index: 1; /* Keeps background behind the text */
-        }
-
-        #one:hover {
-            background-color: rgba(0, 0, 0, 0.7); /* Optional hover effect */
-        }
-
 
         
         
         #two {
             color: black;
-            background-image: url('/public/trivia-background.png');
+            background-image: url('/public/README.webp');
             background-position: center; /* Centers the image */
             background-repeat: no-repeat; /* Prevents the image from repeating */
             background-size:cover; /* Ensures the image covers the button area */
@@ -118,7 +98,7 @@
 
         #three {
             color: black;
-            background-image: url('/public/trivia-background.png');
+            background-image: url('/public/exit.png');
             background-position: center; /* Centers the image */
             background-repeat: no-repeat; /* Prevents the image from repeating */
             background-size:cover; /* Ensures the image covers the button area */
@@ -130,7 +110,7 @@
             font-size: 18px;
             font-weight: bold;
             text-decoration: none;
-            color: white;
+            color: black;
             border: none;
             cursor: pointer;
             width: 100%; /* Button takes full width */
