@@ -6,11 +6,43 @@
     <title>Trivia Results</title>
     <link rel="stylesheet" href="/public/styles.css">
     <style>
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+        
+        .button-container {
+            display: flex;
+            justify-content: space-around; 
+            width: 100%; 
+            margin-top: 20px; 
         }
+        
+        
+
+        
+        .butt {
+            text-decoration: none;  
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            display: inline-block;
+        }
+
+        
+        .butt:hover {
+            background-color: #0056b3;
+        }
+
+        
+        .butt + .butt {
+            margin-left: 0px;
+        }
+
+
+        .centering {
+            text-align: center;
+        }
+
+
     </style>
 </head>
 <body>
@@ -55,14 +87,12 @@
                 <p>No questions available.</p>
             <% } %>
         </section>
-                
 
-        <div>
-            <a href="/trivia" class="butt">Try Again</a><br>
-            <a href="/dashboard" class="butt">Back to Dashboard</a><br> 
-            <a href="/leaderboard" class="butt">Leaderboard</a>
+        <div class="centering">
+            <a id="try" href="/trivia" class="butt">Try Again</a>
+            <a id="back" href="/dashboard" class="butt">Back to Dashboard</a> 
+            <a id="lead" href="/leaderboard" class="butt">Leaderboard</a>
         </div>
     </main>
-    
 </body>
 </html>
