@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="/public/styles.css">
     <style>
         ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+            list-style-type: none; /* Removes bullet points */
+            padding: 0; /* Removes default padding */
+            margin: 0; /* Removes default margin */
         }
     </style>
 </head>
@@ -44,7 +44,9 @@
                 <% } else { %>
                     <p>No questions available at the moment. Please try again later!</p>
                 <% } %>
-                <button type="submit">Submit Answers</button>
+                <div class="butt-container">
+                    <button class="butt" type="submit">Submit</button>
+                </div>
             </form>
         </div>
     </main>
