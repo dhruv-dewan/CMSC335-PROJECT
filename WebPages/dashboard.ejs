@@ -132,8 +132,18 @@
             font-size: 3rem;
         }
 
-        #one, #two, #three:hover {
-          background-color: rgba(0, 0, 0, 0.3);
+        #one:hover, #two:hover, #three:hover {
+        transform: scale(1.05); /* Slight zoom effect */
+        background-color: rgba(0, 0, 0, 0.4); /* Dark overlay */
+        }
+
+        /* Optional: Add a shadow for hover effect */
+        #one:hover, #two:hover, #three:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        p {
+            font-size: 2rem;
         }
 
     </style>
