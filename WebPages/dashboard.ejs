@@ -12,50 +12,63 @@
             align-items: center;
             justify-content: center;
             width: 100vw;
-            height: 20vh; /* Adjust this to control the height of the text area */
+            height: 20vh;
             text-align: center;
             margin: 0;
         }
 
-        /* Dashboard button container */
         .button-dashboard-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            width: 100vw; /* Full viewport width */
+            width: 100vw;
             margin: 0;
             padding: 0;
             color: black;
         }
 
-        /* Style for individual buttons */
         .butt-dashboard {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100vw; /* Ensures each button spans full width */
-            padding: 6rem; /* You can adjust the padding for button size */
+            width: 100vw; 
+            padding: 6rem; 
             text-align: center;
             font-size: 18px;
             font-weight: bold;
             text-decoration: none;
+<<<<<<< HEAD
             color: black;
             background-color: #007BFF; /* Button color */
             border: none;
             cursor: pointer;
             margin: 0; /* Removes gap between buttons */
+=======
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            cursor: pointer;
+            opacity: 1;
+            margin: 0;
+>>>>>>> 36937a85033438147c04a072b69d8dd645e919b6
         }
 
         .butt-dashboard:hover {
-            background-color: #0056b3; /* Darker shade for hover */
+            background-color: #0056b3;
         }
 
         #one {
+<<<<<<< HEAD
             position: relative; /* Allows the pseudo-element to be positioned relative to the anchor */
             background-image: url('/public/trivia-background.png');
             color: black;
             text-decoration: none; /* Remove underline from the link */
+=======
+            position: relative;
+            color: rgba(0, 0, 0, 1);
+            text-decoration: none;
+>>>>>>> 36937a85033438147c04a072b69d8dd645e919b6
             font-size: 3rem;
             font-weight: bold;
             display: flex;
@@ -66,20 +79,50 @@
             cursor: pointer;
             width: 100%;
             height: 100%;
-            padding: 5.5rem; /* Adjust padding for button height */
-            z-index: 2; /* Ensures text is above the background */
+            padding: 5.5rem;
+            z-index: 2;
         }
 
+<<<<<<< HEAD
+=======
+        #one::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('/public/trivia-background.png');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            opacity: 0.5; 
+            z-index: 1;
+        }
+
+        #one:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+>>>>>>> 36937a85033438147c04a072b69d8dd645e919b6
 
         
         
         #two {
             color: black;
+<<<<<<< HEAD
             background-image: url('/public/README.webp');
             background-position: center; /* Centers the image */
             background-repeat: no-repeat; /* Prevents the image from repeating */
             background-size:cover; /* Ensures the image covers the button area */
             padding: 5.5rem; /* Adjust padding for the button height */
+=======
+            background-image: url('/public/trivia-background.png');
+            background-position: center;
+            background-repeat: no-repeat; 
+            background-size:cover; 
+            padding: 5.5rem; 
+>>>>>>> 36937a85033438147c04a072b69d8dd645e919b6
             display: flex;
             justify-content: center;
             align-items: center;
@@ -90,19 +133,27 @@
             color: black;
             border: none;
             cursor: pointer;
-            width: 100%; /* Button takes full width */
-            height: 0%; /* Ensures the height adjusts to the container size */
+            width: 100%; 
+            height: 0%;
             font-size: 3rem;
         }
 
 
         #three {
             color: black;
+<<<<<<< HEAD
             background-image: url('/public/exit.png');
             background-position: center; /* Centers the image */
             background-repeat: no-repeat; /* Prevents the image from repeating */
             background-size:cover; /* Ensures the image covers the button area */
             padding: 5.5rem; /* Adjust padding for the button height */
+=======
+            background-image: url('/public/trivia-background.png');
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-size:cover; 
+            padding: 5.5rem; 
+>>>>>>> 36937a85033438147c04a072b69d8dd645e919b6
             display: flex;
             justify-content: center;
             align-items: center;
@@ -113,13 +164,13 @@
             color: black;
             border: none;
             cursor: pointer;
-            width: 100%; /* Button takes full width */
-            height: 0%; /* Ensures the height adjusts to the container size */
+            width: 100%;
+            height: 0%;
             font-size: 3rem;
         }
 
         #one, #two, #three:hover {
-          background-color: rgba(0, 0, 0, 0.3); /* Optional: Darkens the background on hover */
+          background-color: rgba(0, 0, 0, 0.3);
         }
 
     </style>

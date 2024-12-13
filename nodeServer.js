@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
 
-// User Authentication and Sessiin
 const bcrypt = require("bcrypt"); 
 const jwt = require("jsonwebtoken");
 const session = require("express-session");
@@ -14,13 +13,11 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 app.set("views", path.resolve(__dirname, "WebPages"));
 app.set("view engine", "ejs");
 
-// Serve static files from the "images" directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-require("dotenv").config({ path: path.resolve(__dirname, 'credentialsDontPost/.env') })
+require("dotenv").config({ path: path.resolve(__dirname, '.env') })
 console.log(process.env.MONGO_DB_USERNAME);
 
-// Session Middleware
 app.use(session({
   secret: process.env.JWT_SECRET,
   resave: false,
@@ -62,7 +59,7 @@ async function checkEmailExists(email) {
   try {
     await client.connect();
     const existingUser = await client.db(db).collection(collection).findOne({ email: email });
-    return existingUser !== null; // Return true if email exists, false otherwise
+    return existingUser !== null;
   } catch (e) {
     console.error("Error checking email:", e);
     return false;
@@ -143,12 +140,10 @@ app.post("/login", async (req, res) => {
     return res.render("error", { errorMessage: "Invalid credentials, please try again!" });
   }
 
-  // Storing user in session 
   req.session.user = user;
   res.redirect("/dashboard");
 });
 
-// Dashboard (User profile and leaderboard)
 app.get("/dashboard", (req, res) => {
   if (!req.session.user) {
     return res.redirect("/login");
@@ -204,7 +199,7 @@ app.get("/leaderboard", async (req, res) => {
     await client.connect();
     const leaderboard = await client.db(db).collection(collection)
     .find({}, { projection: { username: 1, highScore: 1, timeTaken: 1 } })
-    .sort({ highScore: -1, timeTaken: 1 }) // Sort by score descending, time ascending
+    .sort({ highScore: -1, timeTaken: 1 })
     .limit(10)
     .toArray();
     res.render("leaderboard", { leaderboard });
@@ -267,7 +262,7 @@ app.get("/trivia", async (req, res) => {
 
           req.session.questions = questions;
           req.session.correctAnswers = questions.map(q => q.correctAnswer);
-          req.session.startTime = Date.now(); // Record the start time
+          req.session.startTime = Date.now();
 
           res.render("trivia", { questions });
       } else {
@@ -291,9 +286,8 @@ app.post("/submit-answers", async (req, res) => {
 
   let score = 0;
   const endTime = Date.now();
-  const timeTaken = Math.floor((endTime - req.session.startTime) / 1000); // Calculate time in seconds
+  const timeTaken = Math.floor((endTime - req.session.startTime) / 1000);
 
-  // Calculate the user's score
   correctAnswers.forEach((correctAnswer, index) => {
       if (userAnswers[`question-${index}`] === correctAnswer) {
           score++;
@@ -302,7 +296,6 @@ app.post("/submit-answers", async (req, res) => {
 
   const total = correctAnswers.length;
 
-  // Update the user's high score and time taken in the database
   if (user) {
       try {
           await client.connect();
@@ -320,7 +313,6 @@ app.post("/submit-answers", async (req, res) => {
                       { $set: { highScore: score, timeTaken: timeTaken } }
                   );
 
-                  // Update session data
                   req.session.user.highScore = score;
                   req.session.user.timeTaken = timeTaken;
               }
@@ -332,12 +324,11 @@ app.post("/submit-answers", async (req, res) => {
       }
   }
 
-  // Render the results page with time taken included
   res.render("results", {
       score,
       total,
       userAnswers,
-      timeTaken, // Pass time taken to the results page
+      timeTaken,
       questions: questions.map((q, index) => ({
           text: q.question,
           correctAnswer: q.correctAnswer,
