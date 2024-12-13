@@ -4,3 +4,4 @@ App Description: Training users of all levels to answer Computer Science trivia 
 YouTube Video Link: https://www.youtube.com/watch?v=YtIX-aGmL4k&ab_channel=SamarthShah <br/>
 APIs: Open Trivia Database (https://opentdb.com/) <br/>
 Contact Email:  samarths@terpmail.umd.edu
+Hosted On: https://trivia-game-41ac.onrender.com/
